@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
+  <rect width="192" height="192" rx="38" fill="#EEF2F6"/>
+  <rect x="14" y="14" width="168" height="168" rx="30" fill="#0F172A"/>
+  <rect x="10" y="10" width="168" height="168" rx="30" fill="#2563EB" stroke="#0F172A" stroke-width="6"/>
+  <!-- Graduation Cap -->
+  <path d="M94 46L34 74L94 102L154 74L94 46Z" fill="#FFFFFF" stroke="#0F172A" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M56 86V118C56 128 73 138 94 138C115 138 132 128 132 118V86" fill="#60A5FA" stroke="#0F172A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M146 78V118" stroke="#FBBF24" stroke-width="6" stroke-linecap="round"/>
+  <!-- Attendance Check Badge -->
+  <circle cx="138" cy="136" r="24" fill="#34D399" stroke="#0F172A" stroke-width="6"/>
+  <path d="M128 136L135 143L149 129" fill="none" stroke="#0F172A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

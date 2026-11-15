@@ -4,6 +4,7 @@ import type { NextConfig } from "next";
 // (e.g., https://your-backend.fastapicloud.dev).
 // In development, it defaults to local backend http://127.0.0.1:5000.
 const rawBackend =
+  process.env.BACKEND_LOCAL ||
   process.env.BACKEND_URL ||
   process.env.NEXT_PUBLIC_API_URL ||
   "http://127.0.0.1:5000";
