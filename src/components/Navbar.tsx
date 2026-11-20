@@ -216,6 +216,25 @@ export default function Navbar({ activeTab, currentUser, onLogout }: NavbarProps
               >
                 {currentUser.institutional_id} · {currentUser.department}
               </div>
+              {currentUser.email_verified && (
+                <div
+                  style={{
+                    marginTop: "0.25rem",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "4px",
+                    fontSize: "0.64rem",
+                    fontWeight: 800,
+                    color: "#166534",
+                    background: "#DCFCE7",
+                    border: "1px solid #166534",
+                    borderRadius: "4px",
+                    padding: "1px 5px",
+                  }}
+                >
+                  OTP Verified · {currentUser.email}
+                </div>
+              )}
             </div>
           </div>
 

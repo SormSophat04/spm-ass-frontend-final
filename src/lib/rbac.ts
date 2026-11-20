@@ -31,6 +31,8 @@ export interface AuthenticatedUser {
   role: AcademicRole;
   department: string;
   avatar_color: string;
+  email_verified?: boolean;
+  auth_source?: string;
   is_active: boolean;
   allowed_modules: ModuleId[];
   role_description?: string;

@@ -9,6 +9,11 @@ interface AuthContextValue {
   user: AuthenticatedUser | null;
   loading: boolean;
   login: (identifier: string, password: string) => Promise<AuthenticatedUser>;
+  verifyEmailOtp: (
+    email: string,
+    otp: string,
+    name?: string
+  ) => Promise<{ user: AuthenticatedUser; isNewUser: boolean }>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<AuthenticatedUser | null>;
   switchUser: (userId: number) => Promise<AuthenticatedUser>;
@@ -77,6 +82,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     []
   );
 
+  const verifyEmailOtp = useCallback(
+    async (
+      email: string,
+      otp: string,
+      name?: string
+    ): Promise<{ user: AuthenticatedUser; isNewUser: boolean }> => {
+      const res = await api.auth.verifyEmailOtp(email.trim(), otp.trim(), name?.trim() || undefined);
+      if (res.token) {
+        setStoredToken(res.token);
+      }
+      const nextUser = res.user as AuthenticatedUser;
+      setUser(nextUser);
+      setLoading(false);
+      return { user: nextUser, isNewUser: Boolean(res.is_new_user) };
+    },
+    []
+  );
+
   const logout = useCallback(async (): Promise<void> => {
     try {
       await api.auth.logout();
@@ -105,7 +128,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, refreshUser, switchUser }}>
+    <AuthContext.Provider
+      value={{ user, loading, login, verifyEmailOtp, logout, refreshUser, switchUser }}
+    >
       {children}
     </AuthContext.Provider>
   );

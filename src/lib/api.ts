@@ -38,12 +38,22 @@ export function buildAuthenticatedUrl(path: string): string {
 export class ApiError extends Error {
   status: number;
   code?: string;
+  retryAfterSeconds?: number;
+  attemptsRemaining?: number;
 
-  constructor(message: string, status: number, code?: string) {
+  constructor(
+    message: string,
+    status: number,
+    code?: string,
+    retryAfterSeconds?: number,
+    attemptsRemaining?: number
+  ) {
     super(message);
     this.name = "ApiError";
     this.status = status;
     this.code = code;
+    this.retryAfterSeconds = retryAfterSeconds;
+    this.attemptsRemaining = attemptsRemaining;
   }
 }
 
@@ -70,14 +80,22 @@ export async function fetchApi<T = any>(endpoint: string, options: RequestInit =
   if (!res.ok) {
     let errMsg = `Request failed: ${res.statusText}`;
     let errCode: string | undefined;
+    let retryAfterSeconds: number | undefined;
+    let attemptsRemaining: number | undefined;
     try {
       const errJson = await res.json();
       errMsg = errJson.message || errJson.error || errMsg;
       errCode = errJson.code;
+      if (typeof errJson.retry_after_seconds === "number") {
+        retryAfterSeconds = errJson.retry_after_seconds;
+      }
+      if (typeof errJson.attempts_remaining === "number") {
+        attemptsRemaining = errJson.attempts_remaining;
+      }
     } catch {
       // Ignore JSON parse error
     }
-    throw new ApiError(errMsg, res.status, errCode);
+    throw new ApiError(errMsg, res.status, errCode, retryAfterSeconds, attemptsRemaining);
   }
 
   return res.json();
@@ -132,6 +150,42 @@ export const api = {
       fetchApi<{ success: boolean; message?: string; token: string; user: any }>("/auth/login", {
         method: "POST",
         body: JSON.stringify({ identifier, password }),
+      }),
+    getOtpStatus: () =>
+      fetchApi<{
+        success: boolean;
+        configured: boolean;
+        provider: string | null;
+        expiry_minutes: number;
+        resend_cooldown_seconds: number;
+        otp_length: number;
+      }>("/auth/otp/status"),
+    requestEmailOtp: (email: string, name?: string) =>
+      fetchApi<{
+        success: boolean;
+        message: string;
+        email: string;
+        masked_email: string;
+        account_exists: boolean;
+        existing_role: string | null;
+        existing_name: string | null;
+        expires_in_seconds: number;
+        resend_cooldown_seconds: number;
+        provider: string;
+      }>("/auth/otp/request", {
+        method: "POST",
+        body: JSON.stringify({ email, ...(name ? { name } : {}) }),
+      }),
+    verifyEmailOtp: (email: string, otp: string, name?: string) =>
+      fetchApi<{
+        success: boolean;
+        message?: string;
+        token: string;
+        user: any;
+        is_new_user?: boolean;
+      }>("/auth/otp/verify", {
+        method: "POST",
+        body: JSON.stringify({ email, otp, ...(name ? { name } : {}) }),
       }),
     logout: () =>
       fetchApi<{ success: boolean; message?: string }>("/auth/logout", {
